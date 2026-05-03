@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-class User(BaseModel):
+class UserSchema(BaseModel):
     username : str
     password: str
     email: str | None
@@ -7,17 +7,17 @@ class User(BaseModel):
     age: int
     gender: str
 
-class UserLogin(BaseModel):
+class UserLoginSchema(BaseModel):
     username: str
     password: str
 
-class UserResponse(BaseModel):
+class UserResponseSchema(BaseModel):
     id: int
     username: str
-    email: str
+    email: str | None
+    phone: str
     age: int
     gender: str
-    is_staff: bool = False
 
     class Config:
         from_attribute = True
