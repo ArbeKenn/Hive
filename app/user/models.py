@@ -1,4 +1,5 @@
 from sqlalchemy import Column, String, Integer, Boolean, DateTime, func
+from sqlalchemy.orm import relationship
 from app.database import Base
 
 class User(Base):
@@ -13,3 +14,5 @@ class User(Base):
     gender = Column(String)
     date_joined = Column(DateTime, default=func.now())
     last_login = Column(DateTime, nullable=True)
+
+    posts = relationship('Post', back_populates='user')

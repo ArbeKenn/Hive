@@ -2,19 +2,19 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from pwdlib import PasswordHash
 
-from app.auth.schemas import UserSchema, UserLoginSchema, UserResponseSchema
-from app.auth.models import User as UserModel
-from app.database import SessionLocal, get_db
-from app.auth.jwt import create_token, get_current_user
+from app.user.schemas import UserSchema, UserLoginSchema
+from app.user.models import User as UserModel
+from app.database import get_db
+from app.user.jwt import create_token, get_current_user
+from app.user.schemas import UserUpdateSchema
 
 router = APIRouter(
-    prefix='/auth',
+    prefix='/user',
     tags=['Authentication']
 )
 
 pwd = PasswordHash.recommended()
 
-#temporarily to check which users are in the database
 @router.get('/all')
 def all_users(db: Session = Depends(get_db)):
     return db.query(UserModel).all()
@@ -44,14 +44,14 @@ def registration(user: UserSchema, db: Session = Depends(get_db)):
 @router.post('/log')
 def login(user: UserLoginSchema, db: Session = Depends(get_db)):
     db_user = db.query(UserModel).filter(
-        UserModel.username == user.username,
-        UserModel.password == user.password
+        UserModel.username == user.username
     ).first()
-    if not db_user or pwd.verify(user.password, db_user.password):
-        raise HTTPException(
-            status_code=404,
-            detail='Incorrect login or password'
-        )
+
+    if not db_user:
+        raise HTTPException(status_code=404, detail='Incorrect login or password')
+
+    if not pwd.verify(user.password, db_user.password):
+        raise HTTPException(status_code=400, detail='Incorrect login or password')
 
     token = create_token(db_user.id)
     return {'token': token}
@@ -63,8 +63,8 @@ def profile(db: Session = Depends(get_db), user_id: int = Depends(get_current_us
         raise HTTPException(status_code=404, detail='User Not Found')
     return user_profile
 
-@router.put('/my_profile/edit', response_model=UserResponseSchema)
-def edit_profile(user: UserResponseSchema, db: Session = Depends(get_db), user_id: int = Depends(get_current_user)):
+@router.put('/my_profile/edit', response_model=UserUpdateSchema)
+def edit_profile(user: UserUpdateSchema, db: Session = Depends(get_db), user_id: int = Depends(get_current_user)):
     db_user = db.query(UserModel).filter(UserModel.id == user_id).first()
 
     if not db_user:
