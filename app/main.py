@@ -1,8 +1,12 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
-from app.database import create_tables
+from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
+
+from app.database import create_tables, get_db
 from app.user.router import router as user_router
 from app.posts.router import router as post_router
+from app.posts.models import Post as PostModel
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -21,7 +25,8 @@ app.include_router(user_router)
 app.include_router(post_router)
 
 @app.get('/')
-def home():
+def home(db: Session = Depends(get_db)):
+    posts = db.query(PostModel).order_by(PostModel.id.desc()).limit(10).all()
     return {
-        'message': 'Добро пожаловать в API! Перейдите на /docs для документации.'
+        'latest_posts': posts,
     }
