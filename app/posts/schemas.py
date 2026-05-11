@@ -3,7 +3,7 @@ comments, share, folders, direct
 """
 from pydantic import BaseModel
 
-class PostCreateSchema(BaseModel):
+class PostCreateUpdateSchema(BaseModel):
     title: str
     description: str | None
 
