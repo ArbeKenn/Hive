@@ -1,0 +1,12 @@
+I have a test on may 17-19. After the test, I will continue.
+
+ideas for the project
+1. coins, marketplace(shop for coins)
+2. rating
+3. news and posts
+4. follow/unfollow, messangers, group
+5. levels
+6. achievements
+7. tasks, quest, group
+8. moderation
+9. violations
